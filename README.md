@@ -37,9 +37,27 @@ Submitting any field with an invalid value will result in a validation error fro
 ## Sample Payloads for the `transactions` endpoint.
 Note: the transaction endpoint accepts a query string, each value is optional, and if no query string is provided the endpoint will return all transactions. Swagger will let you specify the values.
 The date format can be any .NET valid DateTime format. From date cannot be after the To date, and To date cannot be before the From date.
-### Example URLS
+### Example URLs
 * http://localhost:5202/api/PaymentTransactions/transactions
 * http://localhost:5202/api/PaymentTransactions/transactions?ProviderName=trustly
 * http://localhost:5202/api/PaymentTransactions/transactions?ProviderName=trustly&Status=0
 * http://localhost:5202/api/PaymentTransactions/transactions?ProviderName=paypal&Status=0&From=2025-05-06&To=2025-05-07
+## Notes on design and assumptions
+* My original design for the database was simply the PaymentTransactions table. While this worked, I realized that there were a couple of issues with it.
+  - The post method would accept any paymentProvider, not an ideal situation. The same goes with the Currency, and PaymentMethod columns. Unless I wanted to spend a lot
+    of time sanatizing input; I needed a new solution.
+  - I created the PaymentProviders table and seeded it with some data. This allowed my business service to unit test that the paymentProvider input was valid and something it should accept.
+  - The Currency column through me for a loop; however, after thinking about it I thought it would be a good idea to store currency codes, names, and symbols.
+    I created the Currencies table for just this purpose.
+  - I added foreign keys for the payment provider Id, and the currency Id, to the PaymentTransactions table, so that I could join on those tables to get the data.
+  - I did not do this with the PaymentMethod field, which is not a good pattern. I got lazy and just validated the payment method against a list of valid options.
+    If I were to make another pass at this, I would add a new table and relationship between PaymentTransactions and the new PaymentMethod table.
+  - The final design allows me to easily add new payment providers and currencies to the database without having to worrying about input validation.
+* In a larger application I would have created a base repository system in order to avoid having to constantly write CRUD operations for **every repository**. I do this with most of my personal
+  projects because I came from an organization that had no concept of this, and amount of time spend writing boiler plate code was unnecessary. Since this project is relatively small I and the
+  repositories were very complex I opted for a simple approach. I would be happy to discuss this further.
+* I faked all my repositories in my unit tests because this is just the simple approach and the one which is recommened by Microsoft.
+* I did not unit test my controller for the main reason being that business logic should never live in a controller. While its easy to unit test controllers, I believe that integration testing is better
+  for this sort of system.
 
+  
