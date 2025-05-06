@@ -24,7 +24,10 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
 
     public async Task<IEnumerable<PaymentTransaction>> Get(FilterOptionsModel options)
     {
-        var query = _context.PaymentTransactions.AsQueryable();
+        var query = _context.PaymentTransactions
+            .Include(pt => pt.PaymentProvider)
+            .Include(pt => pt.Currency)
+            .AsQueryable();
         query = Filter(query, options);
         return await query.ToListAsync();
     }
@@ -34,16 +37,12 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
         return await _context.PaymentTransactions.CountAsync();
     }
 
-    public async Task<IEnumerable<string>> GetProviders()
+    public async Task<decimal> GetProviderVolume(int providerId)
     {
-        return await _context.PaymentTransactions.Select(pt => pt.ProviderName).Distinct().ToListAsync();
-    }
-
-    public async Task<decimal> GetProviderVolume(string providerName)
-    {
-        //sqlite doesn't like SumAsync, so we fetch the list and then sum.
-        var results = await _context.PaymentTransactions.Where(pt => pt.ProviderName == providerName)
-            .Select(pt => pt.Amount).ToListAsync();
+        var results = await _context.PaymentTransactions
+            .Where(pt => pt.PaymentProviderId == providerId && pt.Status == TransactionStatus.Completed)
+            .Select(pt => pt.Amount)
+            .ToListAsync();
         return results.Sum();
     }
 
@@ -60,7 +59,7 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
     private IQueryable<PaymentTransaction> Filter(IQueryable<PaymentTransaction> query, FilterOptionsModel options)
     {
         if(!string.IsNullOrWhiteSpace(options.ProviderName))
-            query = query.Where(p => p.ProviderName == options.ProviderName);
+            query = query.Where(p => p.PaymentProvider.Name == options.ProviderName);
         
         if(options.Status != null)
             query = query.Where(p => p.Status == options.Status);

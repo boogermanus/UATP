@@ -21,9 +21,12 @@ public class PaymentTransactionsController : ControllerBase
     {
         try
         {
-            model.ProviderName = providerName.ToLower();
-            var result = await _service.Add(model);
+            var result = await _service.Add(providerName, model);
             return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
         }
         catch (Exception e)
         {
@@ -50,7 +53,7 @@ public class PaymentTransactionsController : ControllerBase
     {
         try
         {
-            return (Ok(await _service.Summary()));
+            return Ok(await _service.Summary());
         }
         catch (Exception e)
         {

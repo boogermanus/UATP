@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using UATP.Core.Enums;
 using UATP.Core.Models;
 
@@ -10,22 +11,18 @@ public class PaymentTransactionModel : IValidatableObject
     [SetsRequiredMembers]
     public PaymentTransactionModel()
     {
-        ProviderName = string.Empty;
         Amount = decimal.Zero;
-        Currency = "USD";
         Status = TransactionStatus.Completed;
         Timestamp = DateTime.UtcNow;
         PayerEmail = string.Empty;
         PaymentMethod = string.Empty;
+        PaymentProviderId = 1;
+        CurrencyId = 1;
+        Currency = "USD";
     }
 
     public string TransactionId { get; set; } = string.Empty;
-    [MaxLength(20)]
-    public string ProviderName  { get; set; }
     public required decimal Amount { get; set; }
-    // I am making the assumption here that we will store the currency code
-    [MaxLength(3)]
-    public required string Currency { get; set; }
     public required TransactionStatus Status { get; set; }
     public required DateTime Timestamp { get; set; }
     [EmailAddress]
@@ -33,30 +30,42 @@ public class PaymentTransactionModel : IValidatableObject
     [MaxLength(20)]
     public required string PaymentMethod  { get; set; }
     public string StatusString => Enum.GetName(typeof(TransactionStatus), Status) ?? string.Empty;
+    public int PaymentProviderId { get; set; }
+    [JsonIgnore]
+    public PaymentProvider? PaymentProviderRecord { get; set; }
+    public int CurrencyId { get; set; }
+    [JsonIgnore]
+    public Currency? CurrencyRecord { get; set; }
+    public string PaymentProvider => PaymentProviderRecord?.Name ?? string.Empty;
+    public string NormalizedAmount => $"{CurrencyRecord?.Symbol ?? string.Empty}{Amount}";
+    public required string Currency { get; set; }
 
     public PaymentTransaction ToDomainModel()
     {
         return new PaymentTransaction
         {
             TransactionId = Guid.NewGuid().ToString(),
-            ProviderName = ProviderName.ToLower(),
             Amount = Amount,
-            Currency = Currency.ToUpper(),
             Status = Status,
             Timestamp = DateTime.UtcNow,
             PayerEmail = PayerEmail,
-            PaymentMethod = PaymentMethod.ToLower()
+            PaymentMethod = PaymentMethod.ToUpper(),
+            PaymentProviderId = PaymentProviderId,
+            CurrencyId = CurrencyId,
         };
     }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        // for brevity, we'll only verify a handful of currency codes
-        string[] validCurrencyCodes = ["USD", "EUR", "RUB", "JPY"];
+        string[] supportedPaymentMethods = ["CREDITCARD", "ACH", "WALLET"];
         
-        if(!validCurrencyCodes.Contains(Currency.ToUpper()))
-            yield return new ValidationResult($"Invalid Currency code {Currency}.", [nameof(Currency)]);
+        if(!supportedPaymentMethods.Contains(PaymentMethod.ToUpper()))
+            yield return new ValidationResult("PaymentMethod is not supported");
+        
         if(Amount == decimal.Zero)
             yield return new ValidationResult("Amount cannot be 0.", [nameof(Amount)]);
+        
+        if(!Enum.IsDefined<TransactionStatus>(Status))
+            yield return new ValidationResult("Status is not valid.", [nameof(Status)]);
     }
 }

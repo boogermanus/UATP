@@ -1,4 +1,5 @@
 ﻿using UATP.Core.ApiModels;
+using UATP.Core.Enums;
 
 namespace UATP.Tests.Models;
 
@@ -24,22 +25,9 @@ public class PaymentTransactionModelTests : ModelTestBase
 
         Assert.That(Guid.Parse(result.TransactionId), Is.AssignableTo<Guid>());
     }
-
+    
     [Test]
-    public void ToDomainModelShouldSetCurrencyToUpperCase()
-    {
-        var model = new PaymentTransactionModel
-        {
-            Currency = "usd"
-        };
-        
-        var result = model.ToDomainModel();
-        
-        Assert.That(result.Currency, Is.EqualTo(model.Currency.ToUpper()));
-    }
-
-    [Test]
-    public void ToDomainModelShouldSetPaymentMethodToLowerCase()
+    public void ToDomainModelShouldSetPaymentMethodToUpperCase()
     {
         var model = new PaymentTransactionModel
         {
@@ -48,20 +36,7 @@ public class PaymentTransactionModelTests : ModelTestBase
 
         var result = model.ToDomainModel();
         
-        Assert.That(result.PaymentMethod, Is.EqualTo(model.PaymentMethod.ToLower()));
-    }
-
-    [Test]
-    public void ToDomainModelShouldSetProviderNameToLowerCase()
-    {
-        var model = new PaymentTransactionModel
-        {
-            ProviderName = "PayPal"
-        };
-        
-        var result = model.ToDomainModel();
-        
-        Assert.That(result.ProviderName, Is.EqualTo(model.ProviderName.ToLower()));
+        Assert.That(result.PaymentMethod, Is.EqualTo(model.PaymentMethod.ToUpper()));
     }
 
     [Test]
@@ -69,7 +44,8 @@ public class PaymentTransactionModelTests : ModelTestBase
     {
         var model = new PaymentTransactionModel
         {
-            Amount = 0
+            Amount = 0,
+            PaymentMethod = "CreditCard"
         };
         
         var results = model.Validate(GetValidationContext(model));
@@ -78,17 +54,30 @@ public class PaymentTransactionModelTests : ModelTestBase
     }
 
     [Test]
-    public void ValidateShouldReturnErrorForInvalidCurrency()
+    public void ValidateShouldReturnPaymentMethodError()
     {
         var model = new PaymentTransactionModel
         {
-            Amount = 10,
-            Currency = "str"
+            PaymentMethod = "test"
         };
         
         var results = model.Validate(GetValidationContext(model));
         
-        Assert.That(results.First().ErrorMessage, Contains.Substring("Currency"));
+        Assert.That(results.First().ErrorMessage, Contains.Substring("PaymentMethod"));
     }
-    
+
+    [Test]
+    public void ValidateShouldReturnErrorForStatusValue()
+    {
+        var model = new PaymentTransactionModel
+        {
+            Amount = 10,
+            PaymentMethod = "CreditCard",
+            Status = (TransactionStatus)3
+        };
+        
+        var results = model.Validate(GetValidationContext(model));
+        
+        Assert.That(results.First().ErrorMessage, Contains.Substring("Status"));
+    }
 }

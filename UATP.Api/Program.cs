@@ -17,6 +17,8 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connStr
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
+builder.Services.AddScoped<IPaymentProviderRepository, PaymentProviderRepository>();
+builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
 
 var app = builder.Build();
