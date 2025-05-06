@@ -7,4 +7,8 @@ public interface IPaymentTransactionRepository
 {
     Task<PaymentTransaction> Add(PaymentTransaction paymentTransaction);
     Task<IEnumerable<PaymentTransaction>> Get(FilterOptionsModel options);
+    Task<int> GetPaymentTransactionCount();
+    Task<IEnumerable<string>> GetProviders();
+    Task<decimal> GetProviderVolume(string providerName);
+    Task<Tuple<int, int, int>> GetStatusCounts();
 }

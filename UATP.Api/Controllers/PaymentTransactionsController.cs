@@ -30,5 +30,31 @@ public class PaymentTransactionsController : ControllerBase
             return StatusCode(500, e.Message);
         }
     }
-    
+
+    [HttpGet("transactions")]
+    public async Task<IActionResult> GetTransactions([FromQuery] FilterOptionsModel filterOptions)
+    {
+        try
+        {
+            var result = await _service.Get(filterOptions);
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    [HttpGet("summary")]
+    public async Task<IActionResult> GetSummary()
+    {
+        try
+        {
+            return (Ok(await _service.Summary()));
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
 }

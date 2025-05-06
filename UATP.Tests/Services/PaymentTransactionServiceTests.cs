@@ -43,4 +43,59 @@ public class PaymentTransactionServiceTests
     {
         Assert.That(() => _service.Get(new FilterOptionsModel()), Throws.Nothing);
     }
+
+    [Test]
+    public void GetShouldCallRepositoryGet()
+    {
+        _service.Get(new FilterOptionsModel());
+        A.CallTo(() => _repository.Get(A<FilterOptionsModel>._)).MustHaveHappened();
+    }
+
+    [Test]
+    public void SummaryShouldNotThrow()
+    {
+        Assert.That(() => _service.Summary(), Throws.Nothing);
+    }
+
+    [Test]
+    public async Task SummaryShouldCallGetPaymentTransactionCount()
+    {
+        await _service.Summary();
+        A.CallTo(() => _repository.GetPaymentTransactionCount()).MustHaveHappened();
+    }
+
+    [Test]
+    public async Task SummaryShouldReturnObjectWithTransactionCount()
+    {
+        A.CallTo(() => _repository.GetPaymentTransactionCount()).Returns(10);
+        
+        var result = await _service.Summary();
+        
+        Assert.That(result.TransactionsCount, Is.EqualTo(10));
+    }
+
+    [Test]
+    public async Task SummaryShouldCallGetProviders()
+    {
+        await _service.Summary();
+        A.CallTo(() => _repository.GetProviders()).MustHaveHappened();
+    }
+
+    [Test]
+    public async Task SummaryShouldCallGetProviderVolumeAtLeastOnce()
+    {
+        A.CallTo(() => _repository.GetProviders()).Returns(new List<string> {"paypal","test"});
+        
+        await _service.Summary();
+
+        A.CallTo(() => _repository.GetProviderVolume(A<string>._)).MustHaveHappenedOnceOrMore();
+    }
+
+    [Test]
+    public async Task SummaryShouldCallGetStatusCounts()
+    {
+        await _service.Summary();
+        
+        A.CallTo(() => _repository.GetStatusCounts()).MustHaveHappened();
+    }
 }

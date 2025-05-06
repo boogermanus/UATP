@@ -39,13 +39,13 @@ public class PaymentTransactionModel : IValidatableObject
         return new PaymentTransaction
         {
             TransactionId = Guid.NewGuid().ToString(),
-            ProviderName = ProviderName,
+            ProviderName = ProviderName.ToLower(),
             Amount = Amount,
             Currency = Currency.ToUpper(),
             Status = Status,
             Timestamp = DateTime.UtcNow,
             PayerEmail = PayerEmail,
-            PaymentMethod = PaymentMethod
+            PaymentMethod = PaymentMethod.ToLower()
         };
     }
 
@@ -55,7 +55,7 @@ public class PaymentTransactionModel : IValidatableObject
         string[] validCurrencyCodes = ["USD", "EUR", "RUB", "JPY"];
         
         if(!validCurrencyCodes.Contains(Currency.ToUpper()))
-            yield return new ValidationResult($"Invalid currency code {Currency}.", [nameof(Currency)]);
+            yield return new ValidationResult($"Invalid Currency code {Currency}.", [nameof(Currency)]);
         if(Amount == decimal.Zero)
             yield return new ValidationResult("Amount cannot be 0.", [nameof(Amount)]);
     }

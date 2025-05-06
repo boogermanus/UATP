@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UATP.Core.ApiModels;
+using UATP.Core.Enums;
 using UATP.Core.Interfaces;
 using UATP.Core.Models;
 
@@ -26,6 +27,34 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
         var query = _context.PaymentTransactions.AsQueryable();
         query = Filter(query, options);
         return await query.ToListAsync();
+    }
+
+    public async Task<int> GetPaymentTransactionCount()
+    {
+        return await _context.PaymentTransactions.CountAsync();
+    }
+
+    public async Task<IEnumerable<string>> GetProviders()
+    {
+        return await _context.PaymentTransactions.Select(pt => pt.ProviderName).Distinct().ToListAsync();
+    }
+
+    public async Task<decimal> GetProviderVolume(string providerName)
+    {
+        //sqlite doesn't like SumAsync, so we fetch the list and then sum.
+        var results = await _context.PaymentTransactions.Where(pt => pt.ProviderName == providerName)
+            .Select(pt => pt.Amount).ToListAsync();
+        return results.Sum();
+    }
+
+    public async Task<Tuple<int, int, int>> GetStatusCounts()
+    {
+        var pendingCount = await _context.PaymentTransactions.CountAsync(pt => pt.Status == TransactionStatus.Pending);
+        var completedCount =
+            await _context.PaymentTransactions.CountAsync(pt => pt.Status == TransactionStatus.Completed);
+        var failedCount = await _context.PaymentTransactions.CountAsync(pt => pt.Status == TransactionStatus.Failed);
+        
+        return new (pendingCount, completedCount, failedCount);
     }
 
     private IQueryable<PaymentTransaction> Filter(IQueryable<PaymentTransaction> query, FilterOptionsModel options)

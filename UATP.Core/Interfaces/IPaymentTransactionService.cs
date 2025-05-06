@@ -6,4 +6,5 @@ public interface IPaymentTransactionService
 {
     Task<PaymentTransactionModel?> Add(PaymentTransactionModel model);
     Task<IEnumerable<PaymentTransactionModel>> Get(FilterOptionsModel model);
+    Task<PaymentTransactionsSummaryModel> Summary();
 }
