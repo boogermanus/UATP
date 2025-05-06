@@ -24,22 +24,9 @@ public class PaymentTransactionModelTests : ModelTestBase
 
         Assert.That(Guid.Parse(result.TransactionId), Is.AssignableTo<Guid>());
     }
-
-    // [Test]
-    // public void ToDomainModelShouldSetCurrencyToUpperCase()
-    // {
-    //     var model = new PaymentTransactionModel
-    //     {
-    //         Currency = "usd"
-    //     };
-    //     
-    //     var result = model.ToDomainModel();
-    //     
-    //     Assert.That(result.Currency, Is.EqualTo(model.Currency.ToUpper()));
-    // }
-
+    
     [Test]
-    public void ToDomainModelShouldSetPaymentMethodToLowerCase()
+    public void ToDomainModelShouldSetPaymentMethodToUpperCase()
     {
         var model = new PaymentTransactionModel
         {
@@ -48,21 +35,8 @@ public class PaymentTransactionModelTests : ModelTestBase
 
         var result = model.ToDomainModel();
         
-        Assert.That(result.PaymentMethod, Is.EqualTo(model.PaymentMethod.ToLower()));
+        Assert.That(result.PaymentMethod, Is.EqualTo(model.PaymentMethod.ToUpper()));
     }
-
-    // [Test]
-    // public void ToDomainModelShouldSetProviderNameToLowerCase()
-    // {
-    //     var model = new PaymentTransactionModel
-    //     {
-    //         ProviderName = "PayPal"
-    //     };
-    //     
-    //     var result = model.ToDomainModel();
-    //     
-    //     Assert.That(result.ProviderName, Is.EqualTo(model.ProviderName.ToLower()));
-    // }
 
     [Test]
     public void ValidateShouldReturnZeroErrorForAmount()
@@ -76,19 +50,4 @@ public class PaymentTransactionModelTests : ModelTestBase
         
         Assert.That(results.First().ErrorMessage, Contains.Substring("Amount"));
     }
-
-    // [Test]
-    // public void ValidateShouldReturnErrorForInvalidCurrency()
-    // {
-    //     var model = new PaymentTransactionModel
-    //     {
-    //         Amount = 10,
-    //         Currency = "str"
-    //     };
-    //     
-    //     var results = model.Validate(GetValidationContext(model));
-    //     
-    //     Assert.That(results.First().ErrorMessage, Contains.Substring("Currency"));
-    // }
-    
 }

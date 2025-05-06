@@ -21,8 +21,7 @@ public class PaymentTransactionsController : ControllerBase
     {
         try
         {
-            // model.ProviderName = providerName.ToLower();
-            var result = await _service.Add(model);
+            var result = await _service.Add(providerName, model);
             return Ok(result);
         }
         catch (Exception e)

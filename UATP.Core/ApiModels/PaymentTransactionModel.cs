@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using UATP.Core.Enums;
 using UATP.Core.Models;
 
@@ -15,6 +16,9 @@ public class PaymentTransactionModel : IValidatableObject
         Timestamp = DateTime.UtcNow;
         PayerEmail = string.Empty;
         PaymentMethod = string.Empty;
+        PaymentProviderId = 1;
+        CurrencyId = 1;
+        Currency = "USD";
     }
 
     public string TransactionId { get; set; } = string.Empty;
@@ -27,7 +31,14 @@ public class PaymentTransactionModel : IValidatableObject
     public required string PaymentMethod  { get; set; }
     public string StatusString => Enum.GetName(typeof(TransactionStatus), Status) ?? string.Empty;
     public int PaymentProviderId { get; set; }
+    [JsonIgnore]
+    public PaymentProvider? PaymentProviderRecord { get; set; }
     public int CurrencyId { get; set; }
+    [JsonIgnore]
+    public Currency? CurrencyRecord { get; set; }
+    public string PaymentProvider => PaymentProviderRecord?.Name ?? string.Empty;
+    public string NormalizedAmount => $"{CurrencyRecord?.Symbol ?? string.Empty}{Amount}";
+    public required string Currency { get; set; }
 
     public PaymentTransaction ToDomainModel()
     {

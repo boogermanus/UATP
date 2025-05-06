@@ -31,7 +31,10 @@ public class PaymentTransaction
             Status = Status,
             Timestamp = Timestamp,
             PayerEmail = PayerEmail,
-            PaymentMethod = PaymentMethod
+            PaymentMethod = PaymentMethod,
+            PaymentProviderRecord = PaymentProvider,
+            CurrencyRecord = Currency,
+            Currency = Currency?.Code ?? string.Empty
         };
     }
     

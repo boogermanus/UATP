@@ -24,7 +24,10 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
 
     public async Task<IEnumerable<PaymentTransaction>> Get(FilterOptionsModel options)
     {
-        var query = _context.PaymentTransactions.AsQueryable();
+        var query = _context.PaymentTransactions
+            .Include(pt => pt.PaymentProvider)
+            .Include(pt => pt.Currency)
+            .AsQueryable();
         query = Filter(query, options);
         return await query.ToListAsync();
     }
@@ -56,8 +59,8 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
 
     private IQueryable<PaymentTransaction> Filter(IQueryable<PaymentTransaction> query, FilterOptionsModel options)
     {
-        // if(!string.IsNullOrWhiteSpace(options.ProviderName))
-        //     query = query.Where(p => p.ProviderName == options.ProviderName);
+        if(!string.IsNullOrWhiteSpace(options.ProviderName))
+            query = query.Where(p => p.PaymentProvider.Name == options.ProviderName);
         
         if(options.Status != null)
             query = query.Where(p => p.Status == options.Status);
