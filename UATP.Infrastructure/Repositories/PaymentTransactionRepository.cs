@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UATP.Core;
 using UATP.Core.ApiModels;
-using UATP.Core.Enums;
 using UATP.Core.Interfaces;
 using UATP.Core.Models;
 
@@ -23,7 +21,7 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
         return paymentTransaction;
     }
 
-    public async Task<IEnumerable<PaymentTransaction>> GetAll(FilterOptionsModel options)
+    public async Task<IEnumerable<PaymentTransaction>> Get(FilterOptionsModel options)
     {
         var query = _context.PaymentTransactions.AsQueryable();
         query = Filter(query, options);

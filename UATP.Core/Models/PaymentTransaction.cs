@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using UATP.Core.ApiModels;
 using UATP.Core.Enums;
 
 namespace UATP.Core.Models;
@@ -20,5 +21,20 @@ public class PaymentTransaction
     public required string PayerEmail  { get; set; }
     [MaxLength(20)]
     public required string PaymentMethod  { get; set; }
+
+    public PaymentTransactionModel ToApiModel()
+    {
+        return new PaymentTransactionModel
+        {
+            TransactionId = TransactionId,
+            ProviderName = ProviderName,
+            Amount = Amount,
+            Currency = Currency,
+            Status = Status,
+            Timestamp = Timestamp,
+            PayerEmail = PayerEmail,
+            PaymentMethod = PaymentMethod
+        };
+    }
     
 }

@@ -6,5 +6,5 @@ namespace UATP.Core.Interfaces;
 public interface IPaymentTransactionRepository
 {
     Task<PaymentTransaction> Add(PaymentTransaction paymentTransaction);
-    Task<IEnumerable<PaymentTransaction>> GetAll(FilterOptionsModel options);
+    Task<IEnumerable<PaymentTransaction>> Get(FilterOptionsModel options);
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UATP.Core.Interfaces;
+using UATP.Core.Services;
 using UATP.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +14,10 @@ var connStr = builder.Configuration.GetConnectionString("DefaultConnection") ??
               throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connStr));
 
+builder.Services.AddControllers();
+
 builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
+builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
 
 var app = builder.Build();
 
@@ -28,5 +32,7 @@ var useHttps = builder.Configuration.GetValue<bool>("UseHttps");
 
 if(useHttps)
     app.UseHttpsRedirection();
+
+app.MapControllers();
 
 app.Run();
