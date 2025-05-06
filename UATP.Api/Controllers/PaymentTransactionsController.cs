@@ -24,6 +24,10 @@ public class PaymentTransactionsController : ControllerBase
             var result = await _service.Add(providerName, model);
             return Ok(result);
         }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
         catch (Exception e)
         {
             return StatusCode(500, e.Message);
@@ -49,7 +53,7 @@ public class PaymentTransactionsController : ControllerBase
     {
         try
         {
-            return (Ok(await _service.Summary()));
+            return Ok(await _service.Summary());
         }
         catch (Exception e)
         {

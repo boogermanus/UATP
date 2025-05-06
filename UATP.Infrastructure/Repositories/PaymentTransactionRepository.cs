@@ -37,14 +37,12 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
         return await _context.PaymentTransactions.CountAsync();
     }
 
-    public async Task<IEnumerable<string>> GetProviders()
+    public async Task<decimal> GetProviderVolume(int providerId)
     {
-        throw new NotImplementedException();
-    }
-
-    public async Task<decimal> GetProviderVolume(string providerName)
-    {
-        throw new NotImplementedException();
+        var results = await _context.PaymentTransactions.Where(pt => pt.PaymentProviderId == providerId)
+            .Select(pt => pt.Amount)
+            .ToListAsync();
+        return results.Sum();
     }
 
     public async Task<Tuple<int, int, int>> GetStatusCounts()

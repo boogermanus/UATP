@@ -119,17 +119,22 @@ public class PaymentTransactionServiceTests
     public async Task SummaryShouldCallGetProviders()
     {
         await _service.Summary();
-        A.CallTo(() => _repository.GetProviders()).MustHaveHappened();
+        A.CallTo(() => _paymentProviderRepository.GetPaymentProviders()).MustHaveHappened();
     }
 
     [Test]
     public async Task SummaryShouldCallGetProviderVolumeAtLeastOnce()
     {
-        A.CallTo(() => _repository.GetProviders()).Returns(new List<string> {"paypal","test"});
+        A.CallTo(() => _paymentProviderRepository.GetPaymentProviders())
+            .Returns(new List<PaymentProvider>
+            {
+                new PaymentProvider { Id = 1, Name = "paypal", NormalizedName = "PayPal" },
+                new PaymentProvider { Id = 2, Name = "trustly", NormalizedName = "Trustly" }
+            });
         
         await _service.Summary();
 
-        A.CallTo(() => _repository.GetProviderVolume(A<string>._)).MustHaveHappenedOnceOrMore();
+        A.CallTo(() => _repository.GetProviderVolume(A<int>._)).MustHaveHappenedOnceOrMore();
     }
 
     [Test]

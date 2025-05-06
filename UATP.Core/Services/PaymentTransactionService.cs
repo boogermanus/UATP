@@ -51,13 +51,14 @@ public class PaymentTransactionService : IPaymentTransactionService
     public async Task<PaymentTransactionsSummaryModel> Summary()
     {
         var transactionCount = await _repository.GetPaymentTransactionCount();
-        var providers = await _repository.GetProviders();
+        // var providers = await _repository.GetProviders();
+        var providers = await _paymentProviderRepository.GetPaymentProviders();
         var providerVolumes = new Dictionary<string, decimal>();
         
         foreach (var provider in providers)
         {
-            var volume = await _repository.GetProviderVolume(provider);
-            providerVolumes.Add(provider, volume);
+            var volume = await _repository.GetProviderVolume(provider.Id);
+            providerVolumes.Add(provider.NormalizedName, volume);
         }
 
         var statusCounts = await _repository.GetStatusCounts();

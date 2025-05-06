@@ -43,11 +43,25 @@ public class PaymentTransactionModelTests : ModelTestBase
     {
         var model = new PaymentTransactionModel
         {
-            Amount = 0
+            Amount = 0,
+            PaymentMethod = "CreditCard"
         };
         
         var results = model.Validate(GetValidationContext(model));
         
         Assert.That(results.First().ErrorMessage, Contains.Substring("Amount"));
+    }
+
+    [Test]
+    public void ValidateShouldReturnPaymentMethodError()
+    {
+        var model = new PaymentTransactionModel
+        {
+            PaymentMethod = "test"
+        };
+        
+        var results = model.Validate(GetValidationContext(model));
+        
+        Assert.That(results.First().ErrorMessage, Contains.Substring("PaymentMethod"));
     }
 }

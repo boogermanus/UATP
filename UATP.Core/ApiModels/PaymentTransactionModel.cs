@@ -57,6 +57,11 @@ public class PaymentTransactionModel : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+        string[] supportedPaymentMethods = ["CREDITCARD", "ACH", "WALLET"];
+        
+        if(!supportedPaymentMethods.Contains(PaymentMethod.ToUpper()))
+            yield return new ValidationResult("PaymentMethod is not supported");
+        
         if(Amount == decimal.Zero)
             yield return new ValidationResult("Amount cannot be 0.", [nameof(Amount)]);
     }
