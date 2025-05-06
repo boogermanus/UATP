@@ -5,7 +5,7 @@ using UATP.Core.Models;
 
 namespace UATP.Core.ApiModels;
 
-public class PaymentTransactionModel
+public class PaymentTransactionModel : IValidatableObject
 {
     [SetsRequiredMembers]
     public PaymentTransactionModel()
@@ -28,6 +28,7 @@ public class PaymentTransactionModel
     public required string Currency { get; set; }
     public required TransactionStatus Status { get; set; }
     public required DateTime Timestamp { get; set; }
+    [EmailAddress]
     public required string PayerEmail  { get; set; }
     [MaxLength(20)]
     public required string PaymentMethod  { get; set; }
@@ -40,11 +41,22 @@ public class PaymentTransactionModel
             TransactionId = Guid.NewGuid().ToString(),
             ProviderName = ProviderName,
             Amount = Amount,
-            Currency = Currency,
+            Currency = Currency.ToUpper(),
             Status = Status,
             Timestamp = DateTime.UtcNow,
             PayerEmail = PayerEmail,
             PaymentMethod = PaymentMethod
         };
+    }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        // for brevity, we'll only verify a handful of currency codes
+        string[] validCurrencyCodes = ["USD", "EUR", "RUB", "JPY"];
+        
+        if(!validCurrencyCodes.Contains(Currency.ToUpper()))
+            yield return new ValidationResult($"Invalid currency code {Currency}.", [nameof(Currency)]);
+        if(Amount == decimal.Zero)
+            yield return new ValidationResult("Amount cannot be 0.", [nameof(Amount)]);
     }
 }
