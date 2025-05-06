@@ -1,14 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using UATP.Core.Enums;
 
-namespace UATP.Core.Models;
+namespace UATP.Core.ApiModels;
 
-public class PaymentTransaction
+public class PaymentTransactionModel
 {
-    // I will use a GUID for this value, but SQLlite does not play nice with them
-    // so we will use a string
-    [Key]
-    public required string TransactionId { get; set; }
     [MaxLength(20)]
     public required string ProviderName  { get; set; }
     public required decimal Amount { get; set; }
@@ -20,5 +16,4 @@ public class PaymentTransaction
     public required string PayerEmail  { get; set; }
     [MaxLength(20)]
     public required string PaymentMethod  { get; set; }
-    
 }

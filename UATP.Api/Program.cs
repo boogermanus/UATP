@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using UATP.Core.Interfaces;
+using UATP.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +11,9 @@ builder.Services.AddSwaggerGen();
 
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
               throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connStr)); 
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connStr));
+
+builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
 
 var app = builder.Build();
 
@@ -20,12 +24,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+var useHttps = builder.Configuration.GetValue<bool>("UseHttps");
 
-// app.UseHttpsRedirection();
+if(useHttps)
+    app.UseHttpsRedirection();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
