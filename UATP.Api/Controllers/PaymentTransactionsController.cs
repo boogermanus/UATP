@@ -21,7 +21,7 @@ public class PaymentTransactionsController : ControllerBase
     {
         try
         {
-            model.ProviderName = providerName.ToLower();
+            // model.ProviderName = providerName.ToLower();
             var result = await _service.Add(model);
             return Ok(result);
         }

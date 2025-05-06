@@ -10,26 +10,24 @@ public class PaymentTransaction
     // so we will use a string
     [Key]
     public required string TransactionId { get; set; }
-    [MaxLength(20)]
-    public required string ProviderName  { get; set; }
     public required decimal Amount { get; set; }
     // I am making the assumption here that we will store the currency code
-    [MaxLength(3)]
-    public required string Currency { get; set; }
+    public required int CurrencyId { get; set; }
+    public Currency? Currency { get; set; }
     public required TransactionStatus Status { get; set; }
     public required DateTime Timestamp { get; set; }
     public required string PayerEmail  { get; set; }
     [MaxLength(20)]
     public required string PaymentMethod  { get; set; }
+    public required int PaymentProviderId { get; set; }
+    public PaymentProvider? PaymentProvider { get; set; }
 
     public PaymentTransactionModel ToApiModel()
     {
         return new PaymentTransactionModel
         {
             TransactionId = TransactionId,
-            ProviderName = ProviderName,
             Amount = Amount,
-            Currency = Currency,
             Status = Status,
             Timestamp = Timestamp,
             PayerEmail = PayerEmail,

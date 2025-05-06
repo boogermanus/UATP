@@ -36,15 +36,12 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
 
     public async Task<IEnumerable<string>> GetProviders()
     {
-        return await _context.PaymentTransactions.Select(pt => pt.ProviderName).Distinct().ToListAsync();
+        throw new NotImplementedException();
     }
 
     public async Task<decimal> GetProviderVolume(string providerName)
     {
-        //sqlite doesn't like SumAsync, so we fetch the list and then sum.
-        var results = await _context.PaymentTransactions.Where(pt => pt.ProviderName == providerName)
-            .Select(pt => pt.Amount).ToListAsync();
-        return results.Sum();
+        throw new NotImplementedException();
     }
 
     public async Task<Tuple<int, int, int>> GetStatusCounts()
@@ -59,8 +56,8 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
 
     private IQueryable<PaymentTransaction> Filter(IQueryable<PaymentTransaction> query, FilterOptionsModel options)
     {
-        if(!string.IsNullOrWhiteSpace(options.ProviderName))
-            query = query.Where(p => p.ProviderName == options.ProviderName);
+        // if(!string.IsNullOrWhiteSpace(options.ProviderName))
+        //     query = query.Where(p => p.ProviderName == options.ProviderName);
         
         if(options.Status != null)
             query = query.Where(p => p.Status == options.Status);
