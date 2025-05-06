@@ -70,6 +70,9 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
         if(options.To != null)
             query = query.Where(p => p.Timestamp <= options.To);
 
+        // order by timestamp with the newest transactions displayed first
+        query = query.OrderByDescending(p => p.Timestamp);
+
         return query;
     }
 }
