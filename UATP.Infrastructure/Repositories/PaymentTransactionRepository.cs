@@ -39,7 +39,8 @@ public class PaymentTransactionRepository : IPaymentTransactionRepository
 
     public async Task<decimal> GetProviderVolume(int providerId)
     {
-        var results = await _context.PaymentTransactions.Where(pt => pt.PaymentProviderId == providerId)
+        var results = await _context.PaymentTransactions
+            .Where(pt => pt.PaymentProviderId == providerId && pt.Status == TransactionStatus.Completed)
             .Select(pt => pt.Amount)
             .ToListAsync();
         return results.Sum();

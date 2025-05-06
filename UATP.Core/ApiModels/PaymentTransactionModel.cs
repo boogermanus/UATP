@@ -64,5 +64,8 @@ public class PaymentTransactionModel : IValidatableObject
         
         if(Amount == decimal.Zero)
             yield return new ValidationResult("Amount cannot be 0.", [nameof(Amount)]);
+        
+        if(!Enum.IsDefined<TransactionStatus>(Status))
+            yield return new ValidationResult("Status is not valid.", [nameof(Status)]);
     }
 }

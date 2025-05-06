@@ -26,17 +26,20 @@ public class PaymentTransactionService : IPaymentTransactionService
 
     public async Task<PaymentTransactionModel?> Add(string paymentProvider, PaymentTransactionModel model)
     {
-        var provider = await _paymentProviderRepository.GetPaymentProvider(paymentProvider);
+        var provider = await _paymentProviderRepository.GetPaymentProvider(paymentProvider.ToLower());
         
         if(provider == null)
-            throw new ArgumentException($"Payment provider: {provider} not found.");
+            throw new ArgumentException($"Payment provider: {paymentProvider} not found.");
         
         model.PaymentProviderId = provider.Id;
         
-        var currency = await _currencyRepository.GetCurrency(model.Currency.ToUpper());
-        
+        var currencyUpper = model.Currency.ToUpper();
+        var currency = await _currencyRepository.GetCurrency(currencyUpper);
+
         if(currency == null)
-            throw new ArgumentException($"Currency: {model.Currency.ToUpper()} not found.");
+            throw new ArgumentException($"Currency: {currencyUpper} not found.");
+        
+        model.CurrencyId = currency.Id;
 
         var result =  await _repository.Add(model.ToDomainModel());
         return result.ToApiModel();
@@ -44,6 +47,7 @@ public class PaymentTransactionService : IPaymentTransactionService
 
     public async Task<IEnumerable<PaymentTransactionModel>> Get(FilterOptionsModel model)
     {
+        model.ProviderName = model.ProviderName?.ToLower();
         var results = await _repository.Get(model);
         return results.Select(r => r.ToApiModel()).ToList();
     }
@@ -51,7 +55,6 @@ public class PaymentTransactionService : IPaymentTransactionService
     public async Task<PaymentTransactionsSummaryModel> Summary()
     {
         var transactionCount = await _repository.GetPaymentTransactionCount();
-        // var providers = await _repository.GetProviders();
         var providers = await _paymentProviderRepository.GetPaymentProviders();
         var providerVolumes = new Dictionary<string, decimal>();
         

@@ -1,4 +1,5 @@
 ﻿using UATP.Core.ApiModels;
+using UATP.Core.Enums;
 
 namespace UATP.Tests.Models;
 
@@ -63,5 +64,20 @@ public class PaymentTransactionModelTests : ModelTestBase
         var results = model.Validate(GetValidationContext(model));
         
         Assert.That(results.First().ErrorMessage, Contains.Substring("PaymentMethod"));
+    }
+
+    [Test]
+    public void ValidateShouldReturnErrorForStatusValue()
+    {
+        var model = new PaymentTransactionModel
+        {
+            Amount = 10,
+            PaymentMethod = "CreditCard",
+            Status = (TransactionStatus)3
+        };
+        
+        var results = model.Validate(GetValidationContext(model));
+        
+        Assert.That(results.First().ErrorMessage, Contains.Substring("Status"));
     }
 }
