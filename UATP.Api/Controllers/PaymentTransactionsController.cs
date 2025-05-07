@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using UATP.Core.ApiModels;
 using UATP.Core.Interfaces;
 
@@ -6,6 +7,7 @@ namespace UATP.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PaymentTransactionsController : ControllerBase
 {
     private readonly IPaymentTransactionService _service;
@@ -48,6 +50,7 @@ public class PaymentTransactionsController : ControllerBase
         }
     }
 
+    [AllowAnonymous]
     [HttpGet("summary")]
     public async Task<IActionResult> GetSummary()
     {
