@@ -2,10 +2,23 @@
 
 ## Running the Project
 * Clone the repository
-* Run the project by using `dotnet watch run --project UATP.API`. Note: If you use the `dotnet run` command you will need to manually navigate to the Swagger page `http://localhost:5202/swagger/index.html`.
+* Run the project by using `dotnet watch run --project UATP.API`. Note: If you use the `dotnet run` command you will need to manually navigate to the Swagger page http://localhost:5202/swagger/index.html.
 * There is no need to generate the database, it is included in the repository along with some sample data.
 ## Running the tests
 Run tests using the `dotnet test` command from the repository directory.
+## Authentication
+Before you can use the `ingest` and `transactions` endpoints you need to generate a token and add it to swagger. The `summary` endpoint allows anonymous access.
+1. Copy the following to the Authentication endpoint request body in swagger.
+```
+{
+  "username": "user@example.com",
+  "password": "Passw0rd!"
+}
+```
+2. Copy the resulting token
+3. Click the Authorization button in Swagger and paste the token in.
+4. You should now have access to specified endpoints.
+
 ## Sample Payloads for the `ingest` endpoint
 The following JSON is an example input for the `ingest` endpoint.
 ```
@@ -24,6 +37,8 @@ The following JSON is an example input for the `ingest` endpoint.
 * The payerEmail field must be a valid email address.
 * Valid values for the paymentMethod are: `creditcard`, `ach`, and `wallet`. The are case insensitive, so `CreditCard` and `creditcard` will both work.
 The following JSON is an example invalid input for the `ingest` endpoint.
+
+The following JSON is invalid for every field. This can be used to verify validation messages are generated.
 ```
 {
   "amount": 0,
@@ -53,11 +68,11 @@ The date format can be any .NET valid DateTime format. From date cannot be after
   - I did not do this with the PaymentMethod field, which is not a good pattern. I got lazy and just validated the payment method against a list of valid options.
     If I were to make another pass at this, I would add a new table and relationship between PaymentTransactions and the new PaymentMethod table.
   - The final design allows me to easily add new payment providers and currencies to the database without having to worrying about input validation.
-* In a larger application I would have created a base repository system in order to avoid having to constantly write CRUD operations for **every repository**. I do this with most of my personal
+* In a larger application I would have created a base repository system in order to avoid having to constantly write CRUD operations for *every repository*. I do this with most of my personal
   projects because I came from an organization that had no concept of this, and amount of time spend writing boiler plate code was unnecessary. Since this project is relatively small I and the
   repositories were very complex I opted for a simple approach. I would be happy to discuss this further.
 * I faked all my repositories in my unit tests because this is just the simple approach and the one which is recommened by Microsoft.
 * I did not unit test my controller for the main reason being that business logic should never live in a controller. While its easy to unit test controllers, I believe that integration testing is better
   for this sort of system.
-
+* While I added Authentication and Authorization it is *really* insecure. In a larger app I would make use of the Identity framework to store user information.
   
