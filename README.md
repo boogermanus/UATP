@@ -30,7 +30,7 @@ Before you can use the `ingest` and `transactions` endpoints you need to generat
   "paymentMethod": "creditcard"
 }
 ```
-* Valid `ingest/{paymentProvider}` endpoints are: `paypal`, `trustly`. They are case insensitive, so `paypal` and `PayPal` will both work.
+* Valid `ingest/{providerName}` endpoints are: `paypal`, `trustly`. They are case insensitive, so `paypal` and `PayPal` will both work.
 * The amount field can be positive or negative, but it cannot be zero. (See my assumptions for more information)
 * Valid values for the status field are: 0 (Pending), 1 (Successful), and 2 (Failed). Any other value should throw an error on execute.
 * Valid values for the currency field are: `usd`, `jpy`, and `eur`.
